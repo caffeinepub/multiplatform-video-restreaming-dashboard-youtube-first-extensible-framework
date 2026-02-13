@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Video, Loader2, CheckCircle2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Video, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useSetVideoSource } from '../features/sessions/mutations';
+import { isGoogleDriveLink, getGoogleDrivePermissionsGuidance } from '../lib/googleDriveLinks';
 
 interface VideoSourcePanelProps {
   sessionId: string;
@@ -22,6 +23,7 @@ export function VideoSourcePanel({ sessionId, currentVideoSource }: VideoSourceP
   };
 
   const hasChanges = videoUrl !== (currentVideoSource || '');
+  const isGDriveLink = isGoogleDriveLink(videoUrl);
 
   return (
     <Card>
@@ -55,6 +57,16 @@ export function VideoSourcePanel({ sessionId, currentVideoSource }: VideoSourceP
             Enter a video file URL or RTMP stream URL to use as your video source
           </p>
         </div>
+
+        {isGDriveLink && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Required Permissions for Google Drive</AlertTitle>
+            <AlertDescription className="text-sm whitespace-pre-line">
+              {getGoogleDrivePermissionsGuidance()}
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Button
           onClick={handleSave}

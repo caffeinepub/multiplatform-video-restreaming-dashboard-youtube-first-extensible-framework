@@ -1,12 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Add video media source selection, Streamlabs-like layer composition, and a guided Quick Start flow to start streams with minimal steps.
+**Goal:** Speed up repeated Quick Start setup, add Google Drive/Docs-friendly preset importing and guidance, and surface stream readiness/health checks to reduce common streaming failures.
 
 **Planned changes:**
-- Add per-session support for configuring a non-sensitive video media source reference (e.g., URL + basic metadata) and show/edit it on the session detail page.
-- Add a per-session ordered layer stack (scene/overlay list) with basic editable properties; provide a layers panel to add/remove/reorder layers and toggle visibility, persisting changes across reloads.
-- Add a Quick Start workflow from the sessions list to guide users through required inputs (session title, video source, at least one output target) and then start the stream (or via a final confirmation step), with clear inline validation/errors.
-- Update backend state handling so existing persisted sessions safely gain new fields (video source, layers) with sensible defaults and remain loadable/editable after upgrade.
+- Update Quick Start to support faster defaults: one-click random “fireplace” session title suggestion, one-click reuse of the previous title, and auto-fill Video Source URL from the last used value (saved locally after a successful Quick Start start).
+- Add Google Drive share-link detection in Video Source URL inputs (Quick Start and Session Video Source panel) and show non-blocking “Required permissions” guidance when a Drive share URL is recognized.
+- Add a Quick Start “Preset Import” area that accepts pasted Google Docs text in a strict marker-based format, parses multiple presets (title, video link, ingest URL, stream key), and lets the user select one to auto-fill Quick Start fields; show a friendly message when no valid presets are found.
+- Add a “Stream Health / Readiness” panel on the session detail page with a configuration checklist (video source, outputs, and required output fields) and a network sufficiency warning based on browser-available network information (with a fallback message when unavailable).
+- Add a best-effort YouTube streaming verification UX in the Stream Health panel with manual verification instructions and a per-session locally stored status (no YouTube API keys/OAuth).
+- Update Quick Start inline tips (English) near relevant inputs to help avoid common failures (permissions/link access, ingest URL vs stream key, missing video source/outputs), without adding new required fields.
 
-**User-visible outcome:** Users can pick a video source for a stream, manage an ordered overlay/layer stack for a session, and use a Quick Start flow to create/configure and start a stream while being blocked (with English explanations) if required prerequisites are missing.
+**User-visible outcome:** Users can start sessions faster with remembered defaults, import streaming presets from Google Docs text to auto-fill fields, see Drive-link permission guidance, and use a session “Stream Health/Readiness” panel (including manual YouTube verification status and network warnings) to reduce setup errors.

@@ -1,97 +1,147 @@
 {
   "kind": "build_request",
-  "title": "Add video media sources, Streamlabs-like layers, and quick-start streaming flow",
+  "title": "Enhance Quick Start with Google Drive/Docs presets, faster defaults, and stream health checks",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-6",
-      "text": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
-      "target": "both",
+      "id": "REQ-10",
+      "text": "Enhance the existing Quick Start flow (frontend/src/components/QuickStartDialog.tsx) to speed up repeated setup by offering: (1) a one-click random 'fireplace' session title suggestion, (2) a one-click 'Use previous title' option, and (3) auto-filling the Video Source URL with the previously used value when available.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-quick-method"
         ],
         "quotes": [
-          "Make sure I can add video as media to be streamed"
+          "In quick method it shall get random fireplace title or choose previous one to make process quick\nIn video url get previous one to save time"
         ]
       },
       "acceptanceCriteria": [
-        "Backend session model can store a non-sensitive video source reference (e.g., URL and basic metadata) associated with a session.",
-        "Frontend provides UI on the session detail page to add/select a video source for the session and to display the currently selected source.",
-        "User-facing validation prevents starting a stream when no video source is configured for the session.",
-        "All user-facing text is in English."
+        "Quick Start Step 1 includes a control to generate a random fireplace-style title and puts it into the Session Title input.",
+        "Quick Start Step 1 includes a control to reuse the last used session title (if any) and puts it into the Session Title input.",
+        "Quick Start Step 2 auto-fills the Video Source URL input with the last used video source URL (if any).",
+        "The last used title and last used video source URL are saved locally (e.g., browser localStorage) after a successful Quick Start start."
       ]
     },
     {
-      "id": "REQ-7",
-      "text": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
-      "target": "both",
+      "id": "REQ-11",
+      "text": "Add explicit Google Drive share-link support messaging and validation in the Video Source URL inputs (Quick Start Step 2 in frontend/src/components/QuickStartDialog.tsx and the session Video Source panel in frontend/src/components/VideoSourcePanel.tsx): detect common Google Drive 'share' URL patterns and display required-permissions guidance to the user in English.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-quick-method"
         ],
         "quotes": [
-          "Make sure I can add layers just like streamlabs"
+          "It shall work with gdrive video share link and show Requiredpermissions"
         ]
       },
       "acceptanceCriteria": [
-        "Backend stores a per-session layer stack with order and basic properties needed for editing (e.g., type, name, enabled/visible, position/size/opacity where applicable).",
-        "Frontend provides a layers panel on the session detail page to add, remove, reorder, toggle visibility, and edit basic properties for each layer.",
-        "Layer stack changes persist (reload the session detail page and layers remain).",
-        "The UI clearly indicates layer order (top/bottom) and supports reordering via explicit controls (e.g., move up/down) without requiring real-time collaboration features."
+        "When a user enters a URL that matches common Google Drive share link patterns (e.g., drive.google.com/file/d/.../view), the UI shows a clearly labeled 'Required permissions' help section.",
+        "The permissions guidance tells the user what Google Drive sharing setting is required to allow access via link (e.g., 'Anyone with the link' / public access) and warns that private links may fail.",
+        "If the URL is not recognized as a Google Drive share link, the permissions help section is not shown (or is shown in a non-blocking 'not applicable' state).",
+        "This guidance does not block saving/starting by itself (non-destructive), but appears alongside existing required/empty validation."
       ]
     },
     {
-      "id": "REQ-8",
-      "text": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
-      "target": "both",
+      "id": "REQ-12",
+      "text": "Add a 'Preset Import' slot to the Quick Start flow that lets a user paste structured entries (copied from a Google Docs file) containing video titles, RTMP ingest URL, stream key, and Google Drive video link; parse the pasted text using a strict format that is robust to other unrelated content in the document; allow selecting one parsed preset to auto-fill the Quick Start title, video source URL, and YouTube RTMP fields.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-quick-method"
         ],
         "quotes": [
-          "And must be have ability to quick start of stream"
+          "Add a slot to get details of these video titles, rtmp url, video file link from google Docs file and instruct the format to make sure it shall not get disturbed with other content in the file."
         ]
       },
       "acceptanceCriteria": [
-        "From the sessions list page, users can launch a Quick Start flow that guides them through the minimum required inputs (session title, video source, and at least one output target).",
-        "Completing Quick Start creates/updates the session and automatically starts the session (or presents a single final confirmation step) and navigates to the session detail page showing the session as Live.",
-        "Quick Start shows clear inline errors when required information is missing or invalid and never leaves the app in a partially-created state without telling the user what to do next.",
-        "Start is blocked with an English explanation if required prerequisites are not met (no outputs, no video source)."
+        "Quick Start includes an additional section or step labeled in English (e.g., 'Import preset from Google Docs text') with a multiline text area for pasting content.",
+        "The UI displays an explicit, strict, copy-paste-friendly format specification (in English) that uses clear begin/end markers so unrelated document text does not affect parsing.",
+        "Parsing yields a list of presets; each preset includes at minimum: title, video link (Google Drive share link allowed), ingest URL, and stream key.",
+        "Selecting a parsed preset auto-fills: Session Title, Video Source URL, and the YouTube adapter fields (ingest URL and stream key) for Quick Start.",
+        "If parsing finds zero valid presets, the UI shows a non-crashing validation message explaining no valid entries were detected."
       ]
     },
     {
-      "id": "REQ-9",
-      "text": "Update backend state handling to safely evolve existing sessions to include the new video-source and layer fields without breaking existing persisted data during upgrade.",
-      "target": "backend",
+      "id": "REQ-13",
+      "text": "Add a 'Stream Health / Readiness' panel to the session details page (frontend/src/pages/SessionDetailPage.tsx) that provides (1) a network sufficiency warning based on browser-available network information and (2) a configuration readiness checklist that helps prevent common streaming failures (missing video source, missing output target, missing RTMP fields).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-quick-method"
         ],
         "quotes": [
-          "Make sure I can add video as media to be streamed",
-          "Make sure I can add layers just like streamlabs"
+          "Show stream health and show if network speed is not sufficient."
         ]
       },
       "acceptanceCriteria": [
-        "If the backend data types for sessions change, provide a conditional migration that preserves existing sessions and initializes new fields with sensible defaults (e.g., no media source, empty layer list).",
-        "Existing sessions created before this change can still be loaded in the UI and can be updated with a media source and layers."
+        "Session detail page displays a 'Stream Health' (or 'Readiness') card/panel visible whether or not the session is active.",
+        "The panel shows a configuration checklist that clearly indicates pass/fail for: video source configured, at least one output target configured, and required fields present for the selected output(s) (as applicable).",
+        "The panel includes a network warning when the browser indicates low bandwidth (e.g., using Network Information API when available) and explains that network speed could cause buffering or stream drops.",
+        "If the browser does not support network info APIs, the panel shows 'Network speed information not available in this browser' (or equivalent) rather than failing."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Provide a best-effort 'YouTube streaming verification' UX in the Stream Health / Readiness panel that helps the user confirm whether YouTube is actually receiving/playing the stream, without requiring Google/YouTube API keys: add an explicit manual verification workflow and allow the user to record a verification status per session locally.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-quick-method"
+        ],
+        "quotes": [
+          "Verify whether YouTube is steaming or not."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Stream Health / Readiness panel includes a clearly labeled 'YouTube verification' section.",
+        "The section provides user-facing instructions in English for how to verify on YouTube that the stream is live/receiving (manual checklist and/or a link field the user can paste).",
+        "The user can set a simple status (e.g., Not checked / Verified receiving / Not receiving) that is stored locally per session (e.g., localStorage keyed by sessionId).",
+        "No YouTube Data API key or OAuth is required for this feature; the UI must not claim definitive verification based on unavailable APIs."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Update the Quick Start UX copy and inline guidance to reflect Streamlabs/Prism-style failure avoidance: add concise, actionable tips at the point of input for common failure causes (permissions, incorrect RTMP URL vs stream key, missing video source, and starting before outputs are configured).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-quick-method"
+        ],
+        "quotes": [
+          "Review streaming website like streamlabs prism to understand what makes successful video streaming and how to avoid fails"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Quick Start Step 2 (video source) includes a short tip block about link accessibility/permissions and using direct-accessible media URLs.",
+        "Quick Start Step 3 (YouTube RTMP fields) includes a short tip block clarifying ingest URL vs stream key and warning against sharing stream keys.",
+        "The guidance is written in English and is displayed inline near the relevant inputs.",
+        "These tips do not add new required fields and do not block starting the stream; they are advisory."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor with all logic in backend/main.mo (only add backend/migration.mo if required for upgrade compatibility).",
-    "Do not edit frontend files under frontend/src/components/ui or any other paths listed in frontend.immutablePaths.",
-    "No external databases or third-party services for storage; any persisted configuration must be stored in the Motoko canister state.",
-    "Do not implement real-time collaboration, chat, or WebSocket-based syncing."
+    "Respect the single-actor backend architecture; do not introduce additional backend services.",
+    "Do not edit files under frontend/src/components/ui, frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (compose around them).",
+    "All user-facing text must be in English.",
+    "Do not require Google authentication or YouTube API keys to fulfill the requested Quick Start improvements."
   ],
   "nonGoals": [
-    "Implementing actual live video encoding/transcoding or RTMP broadcasting from within the app/canister.",
-    "Uploading and storing large video files inside the canister (the feature should rely on non-sensitive references/URLs and lightweight metadata).",
-    "A full Streamlabs clone (e.g., plugin marketplace, alerts integrations, donations, chatbot, or advanced animations)."
+    "Implementing actual video streaming/encoding/relay inside the app (the app may configure endpoints and provide guidance, but it is not a streaming engine).",
+    "Integrating Google Drive/Google Docs APIs with OAuth for private document access.",
+    "Definitive automatic detection of YouTube live ingest status via YouTube Data API (no API keys/OAuth in scope); only best-effort/manual verification UX is required."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

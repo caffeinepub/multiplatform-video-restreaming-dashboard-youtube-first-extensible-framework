@@ -1,104 +1,143 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Video sources, layer stack UI, and Quick Start streaming flow",
+  "title": "Quick Start presets, Google Drive guidance, and Stream Health checks (frontend-only)",
   "requirements": [
     {
-      "id": "REQ-6",
-      "summary": "Allow users to configure a per-session video media source and block starting until configured.",
+      "id": "REQ-10",
+      "summary": "Speed up repeated Quick Start setup with random/previous title helpers and auto-fill from last used values saved locally after successful start.",
       "acceptanceCriteria": [
-        "Frontend provides UI on the session detail page to add/select a video source for the session and to display the currently selected source.",
-        "User-facing validation prevents starting a stream when no video source is configured for the session.",
-        "All user-facing text is in English."
+        "Quick Start Step 1 includes a control to generate a random fireplace-style title and puts it into the Session Title input.",
+        "Quick Start Step 1 includes a control to reuse the last used session title (if any) and puts it into the Session Title input.",
+        "Quick Start Step 2 auto-fills the Video Source URL input with the last used video source URL (if any).",
+        "The last used title and last used video source URL are saved locally (e.g., browser localStorage) after a successful Quick Start start."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/sessions/api.ts",
-          "operation": "modify",
-          "description": "Add a frontend API wrapper for the backend capability to store the session video source (call setVideoSource)."
+          "path": "frontend/src/lib/quickStartStorage.ts",
+          "operation": "create",
+          "description": "Add local-only persistence helpers for Quick Start (get/set last used session title and last used video source URL) using browser storage with safe guards for unavailable storage."
         },
         {
-          "path": "frontend/src/features/sessions/mutations.ts",
+          "path": "frontend/src/lib/fireplaceTitles.ts",
+          "operation": "create",
+          "description": "Add a small utility to generate random 'fireplace' session title suggestions (deterministic-enough format, no backend)."
+        },
+        {
+          "path": "frontend/src/components/QuickStartDialog.tsx",
           "operation": "modify",
-          "description": "Add a React Query mutation hook for setting a session video source and invalidating the session query on success (with English toast messaging)."
+          "description": "Enhance Step 1 to include one-click actions for 'Random fireplace title' and 'Use previous title' (conditionally enabled). Enhance Step 2 to auto-fill from last used video source URL when available. After a successful Quick Start start, save last used title and video URL locally via the new storage helper. Use shadcn/ui primitives already used in the file (Dialog, Button, Input, Alert) to keep styling consistent—Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Detect Google Drive share URLs in video source inputs and show non-blocking 'Required permissions' guidance in English.",
+      "acceptanceCriteria": [
+        "When a user enters a URL that matches common Google Drive share link patterns (e.g., drive.google.com/file/d/.../view), the UI shows a clearly labeled 'Required permissions' help section.",
+        "The permissions guidance tells the user what Google Drive sharing setting is required to allow access via link (e.g., 'Anyone with the link' / public access) and warns that private links may fail.",
+        "If the URL is not recognized as a Google Drive share link, the permissions help section is not shown (or is shown in a non-blocking 'not applicable' state).",
+        "This guidance does not block saving/starting by itself (non-destructive), but appears alongside existing required/empty validation."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/googleDriveLinks.ts",
+          "operation": "create",
+          "description": "Add URL detection helpers for common Google Drive 'share' patterns (e.g., drive.google.com/file/d/.../view, open?id=..., uc?id=...) and a small formatter for English 'Required permissions' guidance text."
+        },
+        {
+          "path": "frontend/src/components/QuickStartDialog.tsx",
+          "operation": "modify",
+          "description": "In Step 2 (Video Source URL), detect Google Drive share links and display a clearly labeled 'Required permissions' help section with non-blocking guidance in English (shown only when recognized). Keep existing required/empty validation behavior intact. Use shadcn/ui Alert/text styles for the help block—Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/VideoSourcePanel.tsx",
-          "operation": "create",
-          "description": "Create a video source panel component for the session detail page that lets the user set/update a video URL, shows the currently configured URL/metadata preview state, and uses shadcn-ui form controls (e.g., Card/Input/Button/Alert) for consistent UI. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/SessionDetailPage.tsx",
           "operation": "modify",
-          "description": "Wire the VideoSourcePanel into the session detail page, display the currently selected source, and update Start Stream validation: disable Start when outputs are empty or when no video source is configured, and show an English explanation when blocked. Use shadcn-ui Alert for the blocked-state messaging. Verify the component's usage instructions before implementing."
+          "description": "When editing/saving the session Video Source URL, detect Google Drive share links and display the same non-blocking 'Required permissions' guidance in English near the input. Use shadcn/ui Card/Alert styling to match existing UI—Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-7",
-      "summary": "Provide a Streamlabs-like ordered layer stack editor on the session detail page (add/remove/reorder/toggle/edit) with persisted updates.",
+      "id": "REQ-12",
+      "summary": "Add a Quick Start preset import slot that parses strict Google Docs-copied text into selectable presets that can auto-fill title, video URL, and YouTube RTMP fields.",
       "acceptanceCriteria": [
-        "Frontend provides a layers panel on the session detail page to add, remove, reorder, toggle visibility, and edit basic properties for each layer.",
-        "Layer stack changes persist (reload the session detail page and layers remain).",
-        "The UI clearly indicates layer order (top/bottom) and supports reordering via explicit controls (e.g., move up/down) without requiring real-time collaboration features."
+        "Quick Start includes an additional section or step labeled in English (e.g., 'Import preset from Google Docs text') with a multiline text area for pasting content.",
+        "The UI displays an explicit, strict, copy-paste-friendly format specification (in English) that uses clear begin/end markers so unrelated document text does not affect parsing.",
+        "Parsing yields a list of presets; each preset includes at minimum: title, video link (Google Drive share link allowed), ingest URL, and stream key.",
+        "Selecting a parsed preset auto-fills: Session Title, Video Source URL, and the YouTube adapter fields (ingest URL and stream key) for Quick Start.",
+        "If parsing finds zero valid presets, the UI shows a non-crashing validation message explaining no valid entries were detected."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/features/sessions/api.ts",
-          "operation": "modify",
-          "description": "Add frontend API wrappers needed by the layers UI for backend capabilities related to layers (e.g., add layer, fetch layer details, and any additional layer update/reorder/remove capabilities introduced on the backend). Keep calls capability-focused and reusable from the session detail page."
-        },
-        {
-          "path": "frontend/src/features/sessions/queries.ts",
-          "operation": "modify",
-          "description": "Add React Query hooks to fetch layer details for a session’s layer id list (batch fetch and per-layer caching) to support the layers panel."
-        },
-        {
-          "path": "frontend/src/features/sessions/mutations.ts",
-          "operation": "modify",
-          "description": "Add React Query mutations needed by the layers panel (add layer and, once available, update/remove/reorder/toggle visibility) and ensure session/layer queries are invalidated so changes persist after reload."
-        },
-        {
-          "path": "frontend/src/components/LayersPanel.tsx",
+          "path": "frontend/src/lib/presetImport.ts",
           "operation": "create",
-          "description": "Create a layers panel component showing an ordered stack with explicit move up/down controls, add/remove actions, visibility toggle, and basic editable properties (name, source URL, position, size, opacity where applicable). Use shadcn-ui components (Card/Button/Input/Switch/Sheet/Alert as appropriate) and English-only labels/help text. Verify the component's usage instructions before implementing."
+          "description": "Implement strict-format preset parsing for pasted Google Docs text using explicit begin/end markers and key/value lines; ignore unrelated document content outside marked blocks. Return a list of parsed presets with required fields (title, videoLink, ingestUrl, streamKey) and parse errors suitable for non-crashing UI display."
         },
         {
-          "path": "frontend/src/pages/SessionDetailPage.tsx",
+          "path": "frontend/src/components/QuickStartDialog.tsx",
           "operation": "modify",
-          "description": "Wire the LayersPanel into the session detail page below the video source section and above/near outputs, passing session layer ids and session id, and ensure UI clearly indicates top/bottom ordering and persists changes by relying on mutations + query invalidation. Verify the component's usage instructions before implementing."
+          "description": "Add an 'Import preset from Google Docs text' section within the Quick Start flow containing: a multiline text area for paste, an English format specification with begin/end markers, a parse action (or live parse), a selectable list of parsed presets, and an apply action that auto-fills Session Title + Video Source URL + YouTube RTMP fields (ingest URL + stream key) when YouTube is selected (and/or auto-select YouTube when applying). Show a friendly validation message if zero valid presets are detected. Use shadcn/ui components (Input/Button/Select/Alert and existing dialog layout) for consistent UI—Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-8",
-      "summary": "Add a Quick Start flow from the sessions list to create/configure a session (title, video source, output) and start streaming with minimal steps.",
+      "id": "REQ-13",
+      "summary": "Add a Stream Health / Readiness panel on the session details page with network sufficiency warning and configuration readiness checklist.",
       "acceptanceCriteria": [
-        "From the sessions list page, users can launch a Quick Start flow that guides them through the minimum required inputs (session title, video source, and at least one output target).",
-        "Completing Quick Start creates/updates the session and automatically starts the session (or presents a single final confirmation step) and navigates to the session detail page showing the session as Live.",
-        "Quick Start shows clear inline errors when required information is missing or invalid and never leaves the app in a partially-created state without telling the user what to do next.",
-        "Start is blocked with an English explanation if required prerequisites are not met (no outputs, no video source)."
+        "Session detail page displays a 'Stream Health' (or 'Readiness') card/panel visible whether or not the session is active.",
+        "The panel shows a configuration checklist that clearly indicates pass/fail for: video source configured, at least one output target configured, and required fields present for the selected output(s) (as applicable).",
+        "The panel includes a network warning when the browser indicates low bandwidth (e.g., using Network Information API when available) and explains that network speed could cause buffering or stream drops.",
+        "If the browser does not support network info APIs, the panel shows 'Network speed information not available in this browser' (or equivalent) rather than failing."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/StreamHealthPanel.tsx",
+          "operation": "create",
+          "description": "Create a session-focused 'Stream Health / Readiness' panel as a shadcn/ui Card that (1) reads browser Network Information API when available to show a low-bandwidth warning and (2) renders a readiness checklist for video source present, outputs present, and required output fields present (based on loaded output details). Use shadcn/ui Card/Alert/Badge (or similar) primitives for consistent presentation—Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/SessionDetailPage.tsx",
+          "operation": "modify",
+          "description": "Wire StreamHealthPanel into the session details page layout so it is visible whether or not the session is active, using existing session data (and output IDs) as inputs. Ensure the existing start-blocking alert remains unchanged and complementary."
+        }
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "summary": "Add manual YouTube streaming verification UX to the Stream Health panel and store per-session verification status locally without any YouTube APIs.",
+      "acceptanceCriteria": [
+        "The Stream Health / Readiness panel includes a clearly labeled 'YouTube verification' section.",
+        "The section provides user-facing instructions in English for how to verify on YouTube that the stream is live/receiving (manual checklist and/or a link field the user can paste).",
+        "The user can set a simple status (e.g., Not checked / Verified receiving / Not receiving) that is stored locally per session (e.g., localStorage keyed by sessionId).",
+        "No YouTube Data API key or OAuth is required for this feature; the UI must not claim definitive verification based on unavailable APIs."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/youtubeVerificationStorage.ts",
+          "operation": "create",
+          "description": "Add local-only persistence helpers for per-session YouTube verification state (status enum and optional user-provided YouTube watch/studio URL) keyed by sessionId, using safe browser storage access."
+        },
+        {
+          "path": "frontend/src/components/StreamHealthPanel.tsx",
+          "operation": "modify",
+          "description": "Add a 'YouTube verification' section with clear English instructions for manual verification (e.g., check YouTube Studio Live Control Room / watch page), an optional paste field for a YouTube link, and a simple status control (Not checked / Verified receiving / Not receiving) stored locally per sessionId. Ensure copy explicitly states this is manual/best-effort and does not claim automatic verification. Use shadcn/ui Select/Input/Alert primitives—Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Improve Quick Start inline guidance text to prevent common streaming failures (permissions, RTMP URL vs stream key, missing video source/outputs, premature start).",
+      "acceptanceCriteria": [
+        "Quick Start Step 2 (video source) includes a short tip block about link accessibility/permissions and using direct-accessible media URLs.",
+        "Quick Start Step 3 (YouTube RTMP fields) includes a short tip block clarifying ingest URL vs stream key and warning against sharing stream keys.",
+        "The guidance is written in English and is displayed inline near the relevant inputs.",
+        "These tips do not add new required fields and do not block starting the stream; they are advisory."
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/QuickStartDialog.tsx",
-          "operation": "create",
-          "description": "Create a Quick Start dialog/wizard component launched from the sessions list page that collects session title, video source URL, and one output target (reusing PlatformTargetForm UI patterns). It should run a single final confirmation step that performs: create session → set video source → add output → start session; show inline English errors; and if a failure occurs after session creation, clearly explain next steps and provide a button to navigate to the session detail page to finish setup. Use shadcn-ui Dialog/Stepper-like layout primitives (Dialog, Card, Buttons, Alert) without modifying immutable UI component source. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/SessionsPage.tsx",
           "operation": "modify",
-          "description": "Add a 'Quick Start' action on the sessions list page, wire it to open QuickStartDialog, and ensure the flow navigates to the newly created session detail page on success."
-        },
-        {
-          "path": "frontend/src/features/sessions/mutations.ts",
-          "operation": "modify",
-          "description": "Add a composed helper (or mutation) used by Quick Start to orchestrate the required sequence (create session, set video source, add output target, start session), with consistent query invalidation and English success/failure toasts."
-        },
-        {
-          "path": "frontend/src/pages/SessionDetailPage.tsx",
-          "operation": "modify",
-          "description": "Align session start blocking/explanations with Quick Start prerequisites by ensuring the Start Stream control is blocked (and explained in English) when video source or outputs are missing, so post-Quick-Start navigation is consistent."
+          "description": "Add concise, advisory English tip blocks inline: (a) in Step 2, link accessibility/permissions guidance (including Google Drive considerations) and recommendation for direct-accessible media URLs; (b) in Step 3, clarify RTMP ingest URL vs stream key, caution against sharing stream keys, and remind users to configure outputs before starting. Use shadcn/ui Alert (non-destructive) or muted text styling consistent with the dialog—Verify the component's usage instructions before implementing."
         }
       ]
     }

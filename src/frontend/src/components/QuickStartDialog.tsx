@@ -1,15 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Zap, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Loader2, Zap, CheckCircle2, AlertCircle, Sparkles, RotateCcw, FileText, Info } from 'lucide-react';
 import { useQuickStart } from '../features/sessions/mutations';
 import { platformRegistry } from '../platforms/registry';
 import type { PlatformFieldValue } from '../platforms/types';
+import { generateFireplaceTitle } from '../lib/fireplaceTitles';
+import { getLastUsedTitle, setLastUsedTitle, getLastUsedVideoUrl, setLastUsedVideoUrl } from '../lib/quickStartStorage';
+import { isGoogleDriveLink, getGoogleDrivePermissionsGuidance } from '../lib/googleDriveLinks';
+import { parsePresetsFromText, getPresetFormatInstructions, type StreamPreset } from '../lib/presetImport';
 
 interface QuickStartDialogProps {
   open: boolean;
@@ -32,11 +38,66 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
   const [selectedPlatform, setSelectedPlatform] = useState<string>('');
   const [fieldValues, setFieldValues] = useState<Record<string, PlatformFieldValue>>({});
 
+  // Preset import
+  const [showPresetImport, setShowPresetImport] = useState(false);
+  const [presetText, setPresetText] = useState('');
+  const [parsedPresets, setParsedPresets] = useState<StreamPreset[]>([]);
+  const [presetErrors, setPresetErrors] = useState<string[]>([]);
+  const [selectedPresetIndex, setSelectedPresetIndex] = useState<number | null>(null);
+
   const platforms = platformRegistry.getAllPlatforms();
   const adapter = selectedPlatform ? platformRegistry.getPlatform(selectedPlatform) : null;
 
+  const lastUsedTitle = getLastUsedTitle();
+  const lastUsedVideoUrl = getLastUsedVideoUrl();
+
+  // Auto-fill video URL on step 2
+  useEffect(() => {
+    if (step === 2 && !videoSourceUrl && lastUsedVideoUrl) {
+      setVideoSourceUrl(lastUsedVideoUrl);
+    }
+  }, [step, lastUsedVideoUrl]);
+
   const handleFieldChange = (fieldId: string, value: PlatformFieldValue) => {
     setFieldValues((prev) => ({ ...prev, [fieldId]: value }));
+  };
+
+  const handleGenerateTitle = () => {
+    setTitle(generateFireplaceTitle());
+  };
+
+  const handleUsePreviousTitle = () => {
+    if (lastUsedTitle) {
+      setTitle(lastUsedTitle);
+    }
+  };
+
+  const handleParsePresets = () => {
+    const result = parsePresetsFromText(presetText);
+    setParsedPresets(result.presets);
+    setPresetErrors(result.errors);
+    setSelectedPresetIndex(null);
+  };
+
+  const handleApplyPreset = () => {
+    if (selectedPresetIndex === null || !parsedPresets[selectedPresetIndex]) return;
+
+    const preset = parsedPresets[selectedPresetIndex];
+    
+    // Fill in all fields
+    setTitle(preset.title);
+    setVideoSourceUrl(preset.videoLink);
+    setSelectedPlatform('youtube');
+    setFieldValues({
+      name: preset.title,
+      ingestUrl: preset.ingestUrl,
+      streamKey: preset.streamKey,
+      maxBitrate: 4500,
+    });
+
+    // Close preset import and move to step 1
+    setShowPresetImport(false);
+    setStep(1);
   };
 
   const handleNext = () => {
@@ -100,6 +161,10 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
         outputCategories: categories,
       });
 
+      // Save last used values
+      setLastUsedTitle(title.trim());
+      setLastUsedVideoUrl(videoSourceUrl.trim());
+
       // Navigate to session detail page
       navigate({ to: '/session/$sessionId', params: { sessionId } });
       onOpenChange(false);
@@ -110,6 +175,11 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
       setVideoSourceUrl('');
       setSelectedPlatform('');
       setFieldValues({});
+      setShowPresetImport(false);
+      setPresetText('');
+      setParsedPresets([]);
+      setPresetErrors([]);
+      setSelectedPresetIndex(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start stream');
     }
@@ -123,9 +193,11 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
     }
   };
 
+  const isGDriveLink = isGoogleDriveLink(videoSourceUrl);
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
@@ -137,6 +209,110 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Preset Import Section */}
+          {!showPresetImport ? (
+            <Button
+              variant="outline"
+              onClick={() => setShowPresetImport(true)}
+              className="w-full gap-2"
+            >
+              <FileText className="h-4 w-4" />
+              Import Preset from Google Docs
+            </Button>
+          ) : (
+            <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Import Preset from Google Docs
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPresetImport(false)}
+                >
+                  Close
+                </Button>
+              </div>
+
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Format Instructions</AlertTitle>
+                <AlertDescription className="text-xs whitespace-pre-line mt-2">
+                  {getPresetFormatInstructions()}
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="presetText">Paste Google Docs Text</Label>
+                <Textarea
+                  id="presetText"
+                  placeholder="Paste your preset text here..."
+                  value={presetText}
+                  onChange={(e) => setPresetText(e.target.value)}
+                  rows={8}
+                  className="font-mono text-sm"
+                />
+              </div>
+
+              <Button onClick={handleParsePresets} className="w-full">
+                Parse Presets
+              </Button>
+
+              {presetErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <ul className="list-disc list-inside text-sm">
+                      {presetErrors.map((err, i) => (
+                        <li key={i}>{err}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {parsedPresets.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Select a Preset ({parsedPresets.length} found)</Label>
+                  <Select
+                    value={selectedPresetIndex?.toString() ?? ''}
+                    onValueChange={(val) => setSelectedPresetIndex(parseInt(val))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a preset..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {parsedPresets.map((preset, index) => (
+                        <SelectItem key={index} value={index.toString()}>
+                          {preset.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {selectedPresetIndex !== null && parsedPresets[selectedPresetIndex] && (
+                    <div className="text-xs text-muted-foreground space-y-1 p-3 bg-background rounded border">
+                      <p><strong>Video:</strong> {parsedPresets[selectedPresetIndex].videoLink}</p>
+                      <p><strong>Ingest:</strong> {parsedPresets[selectedPresetIndex].ingestUrl}</p>
+                      <p><strong>Key:</strong> {parsedPresets[selectedPresetIndex].streamKey.substring(0, 8)}...</p>
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={handleApplyPreset}
+                    disabled={selectedPresetIndex === null}
+                    className="w-full"
+                  >
+                    Apply Selected Preset
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          <Separator />
+
           {/* Progress indicator */}
           <div className="flex items-center justify-between">
             {[1, 2, 3].map((s) => (
@@ -176,6 +352,30 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
                   onChange={(e) => setTitle(e.target.value)}
                   autoFocus
                 />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateTitle}
+                    className="gap-2"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    Random Fireplace Title
+                  </Button>
+                  {lastUsedTitle && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleUsePreviousTitle}
+                      className="gap-2"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      Use Previous: {lastUsedTitle.substring(0, 20)}...
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -184,6 +384,18 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
           {step === 2 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Step 2: Video Source</h3>
+              
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Video Source Tips</AlertTitle>
+                <AlertDescription className="text-sm space-y-1">
+                  <p>• Use direct-accessible media URLs (MP4, HLS, RTMP)</p>
+                  <p>• Ensure the link is publicly accessible without authentication</p>
+                  <p>• For Google Drive, set sharing to "Anyone with the link"</p>
+                  <p>• Test the link in an incognito window to verify access</p>
+                </AlertDescription>
+              </Alert>
+
               <div className="space-y-2">
                 <Label htmlFor="quickVideo">Video Source URL</Label>
                 <Input
@@ -198,6 +410,16 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
                   Enter a video file URL or RTMP stream URL
                 </p>
               </div>
+
+              {isGDriveLink && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Required Permissions for Google Drive</AlertTitle>
+                  <AlertDescription className="text-sm whitespace-pre-line">
+                    {getGoogleDrivePermissionsGuidance()}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
           )}
 
@@ -206,6 +428,17 @@ export function QuickStartDialog({ open, onOpenChange }: QuickStartDialogProps) 
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Step 3: Streaming Target</h3>
               
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>RTMP Configuration Tips</AlertTitle>
+                <AlertDescription className="text-sm space-y-1">
+                  <p>• <strong>Ingest URL</strong> is the RTMP server address (e.g., rtmp://a.rtmp.youtube.com/live2)</p>
+                  <p>• <strong>Stream Key</strong> is your unique secret key from YouTube Studio</p>
+                  <p>• Never share your stream key publicly - it grants access to your stream</p>
+                  <p>• Make sure both video source and output are configured before starting</p>
+                </AlertDescription>
+              </Alert>
+
               <div className="space-y-2">
                 <Label htmlFor="quickPlatform">Platform</Label>
                 <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>

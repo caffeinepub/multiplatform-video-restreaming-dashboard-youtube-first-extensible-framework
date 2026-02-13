@@ -1,97 +1,112 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T17:17:00.797Z",
+  "generatedAt": "2026-02-13T05:48:26.628Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 6,
+    "implemented": 6,
     "items": [
       {
-        "id": "REQ-6",
-        "summary": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
+        "id": "REQ-10",
+        "summary": "Enhance the existing Quick Start flow (frontend/src/components/QuickStartDialog.tsx) to speed up repeated setup by offering: (1) a one-click random 'fireplace' session title suggestion, (2) a one-click 'Use previous title' option, and (3) auto-filling the Video Source URL with the previously used value when available.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/sessions/api.ts",
-          "frontend/src/features/sessions/mutations.ts",
-          "frontend/src/components/VideoSourcePanel.tsx",
-          "frontend/src/pages/SessionDetailPage.tsx"
+          "frontend/src/lib/quickStartStorage.ts",
+          "frontend/src/lib/fireplaceTitles.ts",
+          "frontend/src/components/QuickStartDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/features/sessions/api.ts",
-          "frontend/src/features/sessions/mutations.ts",
-          "frontend/src/components/VideoSourcePanel.tsx",
-          "frontend/src/pages/SessionDetailPage.tsx"
+          "frontend/src/lib/quickStartStorage.ts",
+          "frontend/src/lib/fireplaceTitles.ts",
+          "frontend/src/components/QuickStartDialog.tsx"
         ]
       },
       {
-        "id": "REQ-7",
-        "summary": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
+        "id": "REQ-11",
+        "summary": "Add explicit Google Drive share-link support messaging and validation in the Video Source URL inputs (Quick Start Step 2 in frontend/src/components/QuickStartDialog.tsx and the session Video Source panel in frontend/src/components/VideoSourcePanel.tsx): detect common Google Drive 'share' URL patterns and display required-permissions guidance to the user in English.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/features/sessions/api.ts",
-          "frontend/src/features/sessions/queries.ts",
-          "frontend/src/features/sessions/mutations.ts",
-          "frontend/src/components/LayersPanel.tsx",
-          "frontend/src/pages/SessionDetailPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/features/sessions/api.ts",
-          "frontend/src/features/sessions/queries.ts",
-          "frontend/src/features/sessions/mutations.ts",
-          "frontend/src/components/LayersPanel.tsx",
-          "frontend/src/pages/SessionDetailPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-8",
-        "summary": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
-        "status": "implemented",
-        "plannedFiles": [
+          "frontend/src/lib/googleDriveLinks.ts",
           "frontend/src/components/QuickStartDialog.tsx",
-          "frontend/src/pages/SessionsPage.tsx",
-          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/VideoSourcePanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/googleDriveLinks.ts",
+          "frontend/src/components/QuickStartDialog.tsx",
+          "frontend/src/components/VideoSourcePanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Add a 'Preset Import' slot to the Quick Start flow that lets a user paste structured entries (copied from a Google Docs file) containing video titles, RTMP ingest URL, stream key, and Google Drive video link; parse the pasted text using a strict format that is robust to other unrelated content in the document; allow selecting one parsed preset to auto-fill the Quick Start title, video source URL, and YouTube RTMP fields.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/presetImport.ts",
+          "frontend/src/components/QuickStartDialog.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/presetImport.ts",
+          "frontend/src/components/QuickStartDialog.tsx"
+        ]
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Add a 'Stream Health / Readiness' panel to the session details page (frontend/src/pages/SessionDetailPage.tsx) that provides (1) a network sufficiency warning based on browser-available network information and (2) a configuration readiness checklist that helps prevent common streaming failures (missing video source, missing output target, missing RTMP fields).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/StreamHealthPanel.tsx",
           "frontend/src/pages/SessionDetailPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/QuickStartDialog.tsx",
-          "frontend/src/pages/SessionsPage.tsx",
-          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/StreamHealthPanel.tsx",
           "frontend/src/pages/SessionDetailPage.tsx"
         ]
       },
       {
-        "id": "REQ-9",
-        "summary": "Update backend state handling to safely evolve existing sessions to include the new video-source and layer fields without breaking existing persisted data during upgrade.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "id": "REQ-14",
+        "summary": "Provide a best-effort 'YouTube streaming verification' UX in the Stream Health / Readiness panel that helps the user confirm whether YouTube is actually receiving/playing the stream, without requiring Google/YouTube API keys: add an explicit manual verification workflow and allow the user to record a verification status per session locally.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/youtubeVerificationStorage.ts",
+          "frontend/src/components/StreamHealthPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/youtubeVerificationStorage.ts",
+          "frontend/src/components/StreamHealthPanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-15",
+        "summary": "Update the Quick Start UX copy and inline guidance to reflect Streamlabs/Prism-style failure avoidance: add concise, actionable tips at the point of input for common failure causes (permissions, incorrect RTMP URL vs stream key, missing video source, and starting before outputs are configured).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/QuickStartDialog.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/QuickStartDialog.tsx"
+        ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/LayersPanel.tsx",
     "frontend/src/components/QuickStartDialog.tsx",
+    "frontend/src/components/StreamHealthPanel.tsx",
     "frontend/src/components/VideoSourcePanel.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/features/sessions/api.ts",
-    "frontend/src/features/sessions/mutations.ts",
     "frontend/src/features/sessions/queries.ts",
+    "frontend/src/lib/fireplaceTitles.ts",
+    "frontend/src/lib/googleDriveLinks.ts",
+    "frontend/src/lib/presetImport.ts",
+    "frontend/src/lib/quickStartStorage.ts",
+    "frontend/src/lib/youtubeVerificationStorage.ts",
     "frontend/src/pages/SessionDetailPage.tsx",
-    "frontend/src/pages/SessionsPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

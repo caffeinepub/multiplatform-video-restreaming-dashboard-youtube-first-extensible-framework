@@ -2,56 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-support-for-attaching-a-video-media-source-to-a-streaming-session-so-a-user-can-select-what-video-will-be-streamed",
-      "featureTitle": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
-      "files": [
-        "frontend/src/components/VideoSourcePanel.tsx",
-        "frontend/src/features/sessions/api.ts",
-        "frontend/src/features/sessions/mutations.ts",
-        "frontend/src/pages/SessionDetailPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-streamlabs-like-layer-composition-for-a-session-allowing-users-to-create-and-manage-an-ordered-list-of-visual-layers-scene-overlay-stack-that-will-be-part-of-the-stream-composition",
-      "featureTitle": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
-      "files": [
-        "frontend/src/components/LayersPanel.tsx",
-        "frontend/src/features/sessions/api.ts",
-        "frontend/src/features/sessions/mutations.ts",
-        "frontend/src/features/sessions/queries.ts",
-        "frontend/src/pages/SessionDetailPage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-provide-a-quick-start-workflow-that-lets-a-user-go-from-zero-to-a-started-stream-with-minimal-steps-create-session-set-video-source-add-at-least-one-output-target-then-start",
-      "featureTitle": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
+      "featureId": "feature-enhance-the-existing-quick-start-flow-frontend-src-components-quickstartdialog-tsx-to-speed-up-repeated-setup-by-offering-1-a-one-click-random-fireplace-session-title-suggestion-2-a-one-click-use-previous-title-option-and-3-auto-filling-the-video-source-url-with-the-previously-used-value-when-available",
+      "featureTitle": "Enhance the existing Quick Start flow (frontend/src/components/QuickStartDialog.tsx) to speed up repeated setup by offering: (1) a one-click random 'fireplace' session title suggestion, (2) a one-click 'Use previous title' option, and (3) auto-filling the Video Source URL with the previously used value when available.",
       "files": [
         "frontend/src/components/QuickStartDialog.tsx",
-        "frontend/src/features/sessions/mutations.ts",
-        "frontend/src/pages/SessionDetailPage.tsx",
-        "frontend/src/pages/SessionsPage.tsx"
+        "frontend/src/lib/fireplaceTitles.ts",
+        "frontend/src/lib/quickStartStorage.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -61,7 +17,102 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-8"
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-explicit-google-drive-share-link-support-messaging-and-validation-in-the-video-source-url-inputs-quick-start-step-2-in-frontend-src-components-quickstartdialog-tsx-and-the-session-video-source-panel-in-frontend-src-components-videosourcepanel-tsx-detect-common-google-drive-share-url-patterns-and-display-required-permissions-guidance-to-the-user-in-english",
+      "featureTitle": "Add explicit Google Drive share-link support messaging and validation in the Video Source URL inputs (Quick Start Step 2 in frontend/src/components/QuickStartDialog.tsx and the session Video Source panel in frontend/src/components/VideoSourcePanel.tsx): detect common Google Drive 'share' URL patterns and display required-permissions guidance to the user in English.",
+      "files": [
+        "frontend/src/components/QuickStartDialog.tsx",
+        "frontend/src/components/VideoSourcePanel.tsx",
+        "frontend/src/lib/googleDriveLinks.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-preset-import-slot-to-the-quick-start-flow-that-lets-a-user-paste-structured-entries-copied-from-a-google-docs-file-containing-video-titles-rtmp-ingest-url-stream-key-and-google-drive-video-link-parse-the-pasted-text-using-a-strict-format-that-is-robust-to-other-unrelated-content-in-the-document-allow-selecting-one-parsed-preset-to-auto-fill-the-quick-start-title-video-source-url-and-youtube-rtmp-fields",
+      "featureTitle": "Add a 'Preset Import' slot to the Quick Start flow that lets a user paste structured entries (copied from a Google Docs file) containing video titles, RTMP ingest URL, stream key, and Google Drive video link; parse the pasted text using a strict format that is robust to other unrelated content in the document; allow selecting one parsed preset to auto-fill the Quick Start title, video source URL, and YouTube RTMP fields.",
+      "files": [
+        "frontend/src/components/QuickStartDialog.tsx",
+        "frontend/src/lib/presetImport.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-stream-health-readiness-panel-to-the-session-details-page-frontend-src-pages-sessiondetailpage-tsx-that-provides-1-a-network-sufficiency-warning-based-on-browser-available-network-information-and-2-a-configuration-readiness-checklist-that-helps-prevent-common-streaming-failures-missing-video-source-missing-output-target-missing-rtmp-fields",
+      "featureTitle": "Add a 'Stream Health / Readiness' panel to the session details page (frontend/src/pages/SessionDetailPage.tsx) that provides (1) a network sufficiency warning based on browser-available network information and (2) a configuration readiness checklist that helps prevent common streaming failures (missing video source, missing output target, missing RTMP fields).",
+      "files": [
+        "frontend/src/components/StreamHealthPanel.tsx",
+        "frontend/src/pages/SessionDetailPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-a-best-effort-youtube-streaming-verification-ux-in-the-stream-health-readiness-panel-that-helps-the-user-confirm-whether-youtube-is-actually-receiving-playing-the-stream-without-requiring-google-youtube-api-keys-add-an-explicit-manual-verification-workflow-and-allow-the-user-to-record-a-verification-status-per-session-locally",
+      "featureTitle": "Provide a best-effort 'YouTube streaming verification' UX in the Stream Health / Readiness panel that helps the user confirm whether YouTube is actually receiving/playing the stream, without requiring Google/YouTube API keys: add an explicit manual verification workflow and allow the user to record a verification status per session locally.",
+      "files": [
+        "frontend/src/components/StreamHealthPanel.tsx",
+        "frontend/src/lib/youtubeVerificationStorage.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-quick-start-ux-copy-and-inline-guidance-to-reflect-streamlabs-prism-style-failure-avoidance-add-concise-actionable-tips-at-the-point-of-input-for-common-failure-causes-permissions-incorrect-rtmp-url-vs-stream-key-missing-video-source-and-starting-before-outputs-are-configured",
+      "featureTitle": "Update the Quick Start UX copy and inline guidance to reflect Streamlabs/Prism-style failure avoidance: add concise, actionable tips at the point of input for common failure causes (permissions, incorrect RTMP URL vs stream key, missing video source, and starting before outputs are configured).",
+      "files": [
+        "frontend/src/components/QuickStartDialog.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-15"
       ],
       "confidence": "high"
     }

@@ -1,11 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "Build an app to stream a single video source to multiple platforms (YouTube-first, extensible), expanding to include media input management, Streamlabs-like layer/overlay composition, and a quick-start flow to begin streaming rapidly.",
+  "projectStateVersion": 7,
+  "summary": "Build an app to stream a single video source to multiple platforms (YouTube-first, extensible), with a quick-start flow enhanced by Google Drive/Docs-based input selection and stream health monitoring.",
   "architectural_notes": [
     "Design platform-specific streaming integrations as modular adapters (start with YouTube; allow adding other platforms later).",
     "Introduce a compositing/layer system (scene graph) to support Streamlabs-like overlays and multiple sources before outputting to platform adapters.",
-    "Add a quick-start path with sensible defaults that still maps to the underlying multistream session model."
+    "Add a quick-start path with sensible defaults that still maps to the underlying multistream session model.",
+    "If supporting Google Drive/Docs inputs, design a permissions/access-check step (and/or OAuth flow) to validate file visibility before starting a stream.",
+    "Define and version a strict, machine-parseable Google Docs content format (e.g., delimited blocks or JSON-like sections) to avoid being disrupted by unrelated text.",
+    "Introduce a stream health subsystem that aggregates client network checks and platform-side status (e.g., YouTube ingest/health) into a single UI indicator."
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -73,6 +76,54 @@
         "REQ-8"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-enhance-the-existing-quick-start-flow-frontend-src-components-quickstartdialog-tsx-to-speed-up-repeated-setup-by-offering-1-a-one-click-random-fireplace-session-title-suggestion-2-a-one-click-use-previous-title-option-and-3-auto-filling-the-video-source-url-with-the-previously-used-value-when-available",
+      "title": "Enhance the existing Quick Start flow (frontend/src/components/QuickStartDialog.tsx) to speed up repeated setup by offering: (1) a one-click random 'fireplace' session title suggestion, (2) a one-click 'Use previous title' option, and (3) auto-filling the Video Source URL with the previously used value when available.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-explicit-google-drive-share-link-support-messaging-and-validation-in-the-video-source-url-inputs-quick-start-step-2-in-frontend-src-components-quickstartdialog-tsx-and-the-session-video-source-panel-in-frontend-src-components-videosourcepanel-tsx-detect-common-google-drive-share-url-patterns-and-display-required-permissions-guidance-to-the-user-in-english",
+      "title": "Add explicit Google Drive share-link support messaging and validation in the Video Source URL inputs (Quick Start Step 2 in frontend/src/components/QuickStartDialog.tsx and the session Video Source panel in frontend/src/components/VideoSourcePanel.tsx): detect common Google Drive 'share' URL patterns and display required-permissions guidance to the user in English.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-preset-import-slot-to-the-quick-start-flow-that-lets-a-user-paste-structured-entries-copied-from-a-google-docs-file-containing-video-titles-rtmp-ingest-url-stream-key-and-google-drive-video-link-parse-the-pasted-text-using-a-strict-format-that-is-robust-to-other-unrelated-content-in-the-document-allow-selecting-one-parsed-preset-to-auto-fill-the-quick-start-title-video-source-url-and-youtube-rtmp-fields",
+      "title": "Add a 'Preset Import' slot to the Quick Start flow that lets a user paste structured entries (copied from a Google Docs file) containing video titles, RTMP ingest URL, stream key, and Google Drive video link; parse the pasted text using a strict format that is robust to other unrelated content in the document; allow selecting one parsed preset to auto-fill the Quick Start title, video source URL, and YouTube RTMP fields.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-stream-health-readiness-panel-to-the-session-details-page-frontend-src-pages-sessiondetailpage-tsx-that-provides-1-a-network-sufficiency-warning-based-on-browser-available-network-information-and-2-a-configuration-readiness-checklist-that-helps-prevent-common-streaming-failures-missing-video-source-missing-output-target-missing-rtmp-fields",
+      "title": "Add a 'Stream Health / Readiness' panel to the session details page (frontend/src/pages/SessionDetailPage.tsx) that provides (1) a network sufficiency warning based on browser-available network information and (2) a configuration readiness checklist that helps prevent common streaming failures (missing video source, missing output target, missing RTMP fields).",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-best-effort-youtube-streaming-verification-ux-in-the-stream-health-readiness-panel-that-helps-the-user-confirm-whether-youtube-is-actually-receiving-playing-the-stream-without-requiring-google-youtube-api-keys-add-an-explicit-manual-verification-workflow-and-allow-the-user-to-record-a-verification-status-per-session-locally",
+      "title": "Provide a best-effort 'YouTube streaming verification' UX in the Stream Health / Readiness panel that helps the user confirm whether YouTube is actually receiving/playing the stream, without requiring Google/YouTube API keys: add an explicit manual verification workflow and allow the user to record a verification status per session locally.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-quick-start-ux-copy-and-inline-guidance-to-reflect-streamlabs-prism-style-failure-avoidance-add-concise-actionable-tips-at-the-point-of-input-for-common-failure-causes-permissions-incorrect-rtmp-url-vs-stream-key-missing-video-source-and-starting-before-outputs-are-configured",
+      "title": "Update the Quick Start UX copy and inline guidance to reflect Streamlabs/Prism-style failure avoidance: add concise, actionable tips at the point of input for common failure causes (permissions, incorrect RTMP URL vs stream key, missing video source, and starting before outputs are configured).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -106,6 +157,36 @@
       "reqIds": [
         "REQ-9"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Quick-start: support Google Drive share links as video sources and surface required permissions/access checks to the user",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Quick-start: speed up setup by suggesting a random 'fireplace' title or reusing a previously used title, and defaulting the video URL to the previously used one",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Import session presets from a Google Docs file: parse structured entries containing video titles, RTMP URLs, and Google Drive video links; provide a strict format so other doc content doesn’t break parsing",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add stream health monitoring: show stream health, warn on insufficient network speed, and verify whether YouTube is actively streaming/ingesting",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Research Streamlabs/Prism-like UX patterns and failure-avoidance best practices to improve streaming success rate and reduce setup errors",
+      "reqIds": [],
       "status": "pending"
     }
   ],

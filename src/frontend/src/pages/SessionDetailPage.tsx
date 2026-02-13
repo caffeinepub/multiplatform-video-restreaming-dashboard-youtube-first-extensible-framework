@@ -12,6 +12,7 @@ import { OutputsList } from '../components/OutputsList';
 import { PlatformTargetForm } from '../components/PlatformTargetForm';
 import { VideoSourcePanel } from '../components/VideoSourcePanel';
 import { LayersPanel } from '../components/LayersPanel';
+import { StreamHealthPanel } from '../components/StreamHealthPanel';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 export default function SessionDetailPage() {
@@ -129,6 +130,8 @@ export default function SessionDetailPage() {
         </Alert>
       )}
 
+      <StreamHealthPanel session={session} />
+
       <VideoSourcePanel sessionId={session.id} currentVideoSource={session.videoSourceUrl} />
 
       <LayersPanel sessionId={session.id} layerIds={session.layers} />
@@ -138,16 +141,16 @@ export default function SessionDetailPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Output Targets</CardTitle>
-              <CardDescription>Configure platforms to stream to</CardDescription>
+              <CardDescription>Streaming destinations for this session</CardDescription>
             </div>
             <Sheet open={isAddTargetOpen} onOpenChange={setIsAddTargetOpen}>
               <SheetTrigger asChild>
-                <Button className="gap-2">
+                <Button size="sm" className="gap-2">
                   <Plus className="h-4 w-4" />
                   Add Target
                 </Button>
               </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
+              <SheetContent>
                 <SheetHeader>
                   <SheetTitle>Add Streaming Target</SheetTitle>
                 </SheetHeader>
@@ -162,7 +165,14 @@ export default function SessionDetailPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <OutputsList sessionId={session.id} outputIds={session.outputs} />
+          {session.outputs.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No output targets configured yet.</p>
+              <p className="text-sm mt-1">Add a target to start streaming.</p>
+            </div>
+          ) : (
+            <OutputsList sessionId={session.id} outputIds={session.outputs} />
+          )}
         </CardContent>
       </Card>
     </div>

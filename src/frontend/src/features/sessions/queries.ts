@@ -3,19 +3,6 @@ import { useActor } from '../../hooks/useActor';
 import * as api from './api';
 import type { SessionId, StreamTargetId, LayerId } from '../../backend';
 
-export function useListActiveSessions() {
-  const { actor, isFetching } = useActor();
-
-  return useQuery({
-    queryKey: ['sessions', 'active'],
-    queryFn: async () => {
-      if (!actor) return [];
-      return api.listActiveSessions(actor);
-    },
-    enabled: !!actor && !isFetching,
-  });
-}
-
 export function useGetSession(sessionId: SessionId) {
   const { actor, isFetching } = useActor();
 
@@ -25,7 +12,7 @@ export function useGetSession(sessionId: SessionId) {
       if (!actor) throw new Error('Actor not initialized');
       return api.getSession(actor, sessionId);
     },
-    enabled: !!actor && !isFetching && !!sessionId,
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -46,10 +33,13 @@ export function useGetOutputs(outputIds: StreamTargetId[]) {
   const { actor, isFetching } = useActor();
 
   return useQuery({
-    queryKey: ['outputs', 'batch', outputIds.map(id => id.toString()).join(',')],
+    queryKey: ['outputs', 'batch', outputIds.map(id => id.toString())],
     queryFn: async () => {
-      if (!actor) return [];
-      return Promise.all(outputIds.map((id) => api.getOutput(actor, id)));
+      if (!actor) throw new Error('Actor not initialized');
+      const outputs = await Promise.all(
+        outputIds.map(id => api.getOutput(actor, id))
+      );
+      return outputs;
     },
     enabled: !!actor && !isFetching && outputIds.length > 0,
   });
@@ -72,11 +62,27 @@ export function useGetLayers(layerIds: LayerId[]) {
   const { actor, isFetching } = useActor();
 
   return useQuery({
-    queryKey: ['layers', 'batch', layerIds.map(id => id.toString()).join(',')],
+    queryKey: ['layers', 'batch', layerIds.map(id => id.toString())],
     queryFn: async () => {
-      if (!actor) return [];
-      return Promise.all(layerIds.map((id) => api.getLayer(actor, id)));
+      if (!actor) throw new Error('Actor not initialized');
+      const layers = await Promise.all(
+        layerIds.map(id => api.getLayer(actor, id))
+      );
+      return layers;
     },
     enabled: !!actor && !isFetching && layerIds.length > 0,
+  });
+}
+
+export function useListActiveSessions() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery({
+    queryKey: ['sessions', 'active'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not initialized');
+      return api.listActiveSessions(actor);
+    },
+    enabled: !!actor && !isFetching,
   });
 }

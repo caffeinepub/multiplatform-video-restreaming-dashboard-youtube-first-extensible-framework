@@ -4,9 +4,9 @@ import Map "mo:core/Map";
 import Nat "mo:core/Nat";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   type SessionId = Text;
   type StreamTargetId = Nat;
