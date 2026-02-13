@@ -1,0 +1,70 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-12T17:17:00.794Z",
+  "summary": "Diff adds backend fields for per-session videoSourceUrl and layer IDs, introduces a migration module, and adds frontend panels for video source + layers plus a Quick Start dialog. However, several layer-management capabilities and parts of the Quick Start flow/backend support are not fully evidenced in the provided diff summary.",
+  "missing_requirements": [
+    {
+      "id": "REQ-6",
+      "requirement": "Backend session model can store a non-sensitive video source reference (e.g., URL and basic metadata) associated with a session.",
+      "reason": "Session stores only a nullable URL (videoSourceUrl) with no additional metadata fields evidenced (e.g., name/type/duration).",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Frontend layers panel supports remove, reorder (move up/down), toggle visibility, and edit basic properties for each layer.",
+      "reason": "LayersPanel.tsx is truncated; only add-layer UI and display of ordered stacking are clearly evidenced. No explicit evidence of remove/reorder/toggle/edit controls in the shown portion.",
+      "evidence": [
+        "frontend/src/components/LayersPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Backend stores per-session layer stack with order and basic properties needed for editing (e.g., type, name, enabled/visible, position/size/opacity where applicable).",
+      "reason": "Backend layer type includes name/sourceUrl/position/size, but no visibility/enabled flag, opacity, or type is evidenced. Session stores only an array of layer IDs, but no explicit reorder/update/delete layer APIs are evidenced in the truncated backend snippet.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "Completing Quick Start creates/updates the session and automatically starts the session (or presents a single final confirmation step) and navigates to the session detail page showing the session as Live.",
+      "reason": "QuickStartDialog calls useQuickStart.mutateAsync and then navigates, but the diff summary does not show the implementation of the quick-start mutation or any backend method that guarantees both session creation/update and start. backend/main.mo excerpt shows createSession/addOutput/startSession separately but no quickStart endpoint is evidenced.",
+      "evidence": [
+        "frontend/src/components/QuickStartDialog.tsx",
+        "frontend/src/features/sessions/mutations.ts",
+        "backend/main.mo",
+        "frontend/src/features/sessions/api.ts"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "requirement": "Quick Start never leaves the app in a partially-created state without telling the user what to do next.",
+      "reason": "Because the quick-start backend/mutation implementation is not shown, it is not evidenced that the operation is atomic (e.g., session creation + output + start) or that partial failures are handled without leaving partial state.",
+      "evidence": [
+        "frontend/src/features/sessions/mutations.ts",
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.62,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/LayersPanel.tsx",
+    "frontend/src/components/QuickStartDialog.tsx",
+    "frontend/src/components/VideoSourcePanel.tsx",
+    "frontend/src/features/sessions/api.ts",
+    "frontend/src/features/sessions/mutations.ts",
+    "frontend/src/features/sessions/queries.ts",
+    "frontend/src/pages/SessionDetailPage.tsx",
+    "frontend/src/pages/SessionsPage.tsx",
+    "project_state.json"
+  ]
+}

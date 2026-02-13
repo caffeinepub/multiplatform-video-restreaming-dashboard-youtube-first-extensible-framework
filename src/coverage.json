@@ -1,0 +1,100 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-12T17:17:00.797Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 4,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-6",
+        "summary": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/sessions/api.ts",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/VideoSourcePanel.tsx",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/sessions/api.ts",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/VideoSourcePanel.tsx",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/features/sessions/api.ts",
+          "frontend/src/features/sessions/queries.ts",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/LayersPanel.tsx",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/features/sessions/api.ts",
+          "frontend/src/features/sessions/queries.ts",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/components/LayersPanel.tsx",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/QuickStartDialog.tsx",
+          "frontend/src/pages/SessionsPage.tsx",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/QuickStartDialog.tsx",
+          "frontend/src/pages/SessionsPage.tsx",
+          "frontend/src/features/sessions/mutations.ts",
+          "frontend/src/pages/SessionDetailPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Update backend state handling to safely evolve existing sessions to include the new video-source and layer fields without breaking existing persisted data during upgrade.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "build-request.json",
+    "build-template/README.md",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/LayersPanel.tsx",
+    "frontend/src/components/QuickStartDialog.tsx",
+    "frontend/src/components/VideoSourcePanel.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/features/sessions/api.ts",
+    "frontend/src/features/sessions/mutations.ts",
+    "frontend/src/features/sessions/queries.ts",
+    "frontend/src/pages/SessionDetailPage.tsx",
+    "frontend/src/pages/SessionsPage.tsx",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

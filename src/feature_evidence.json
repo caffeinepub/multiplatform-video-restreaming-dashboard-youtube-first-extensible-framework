@@ -1,0 +1,69 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-support-for-attaching-a-video-media-source-to-a-streaming-session-so-a-user-can-select-what-video-will-be-streamed",
+      "featureTitle": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
+      "files": [
+        "frontend/src/components/VideoSourcePanel.tsx",
+        "frontend/src/features/sessions/api.ts",
+        "frontend/src/features/sessions/mutations.ts",
+        "frontend/src/pages/SessionDetailPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-streamlabs-like-layer-composition-for-a-session-allowing-users-to-create-and-manage-an-ordered-list-of-visual-layers-scene-overlay-stack-that-will-be-part-of-the-stream-composition",
+      "featureTitle": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
+      "files": [
+        "frontend/src/components/LayersPanel.tsx",
+        "frontend/src/features/sessions/api.ts",
+        "frontend/src/features/sessions/mutations.ts",
+        "frontend/src/features/sessions/queries.ts",
+        "frontend/src/pages/SessionDetailPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-a-quick-start-workflow-that-lets-a-user-go-from-zero-to-a-started-stream-with-minimal-steps-create-session-set-video-source-add-at-least-one-output-target-then-start",
+      "featureTitle": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
+      "files": [
+        "frontend/src/components/QuickStartDialog.tsx",
+        "frontend/src/features/sessions/mutations.ts",
+        "frontend/src/pages/SessionDetailPage.tsx",
+        "frontend/src/pages/SessionsPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

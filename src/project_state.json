@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "Build an app to stream a single video source to multiple platforms (YouTube-first, extensible), expanding to include media input management, Streamlabs-like layer/overlay composition, and a quick-start flow to begin streaming rapidly.",
+  "architectural_notes": [
+    "Design platform-specific streaming integrations as modular adapters (start with YouTube; allow adding other platforms later).",
+    "Introduce a compositing/layer system (scene graph) to support Streamlabs-like overlays and multiple sources before outputting to platform adapters.",
+    "Add a quick-start path with sensible defaults that still maps to the underlying multistream session model."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-a-frontend-workflow-to-define-a-single-input-video-source-and-create-a-multistream-session-that-targets-multiple-platforms-starting-with-youtube",
+      "title": "Create a frontend workflow to define a single input video source and create a multistream session that targets multiple platforms, starting with YouTube.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-platform-adapter-framework-frontend-backend-data-model-so-new-streaming-platforms-can-be-added-later-without-redesigning-core-session-flows-the-framework-must-support-platform-specific-fields-and-validation-rules-e-g-youtube-ingest-url-stream-key",
+      "title": "Implement a platform-adapter framework (frontend + backend data model) so new streaming platforms can be added later without redesigning core session flows. The framework must support platform-specific fields and validation rules (e.g., YouTube ingest URL + stream key).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-youtube-as-the-first-supported-platform-including-the-ability-to-configure-rtmp-ingest-settings-and-show-the-user-the-resulting-output-endpoint-details-for-use-in-external-broadcasting-restreaming-tools",
+      "title": "Add YouTube as the first supported platform, including the ability to configure RTMP ingest settings and show the user the resulting output endpoint details for use in external broadcasting/restreaming tools.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-persist-multistream-sessions-and-their-non-sensitive-configuration-in-the-motoko-backend-single-actor-and-load-update-them-from-the-react-app-using-react-query",
+      "title": "Persist multistream sessions and their non-sensitive configuration in the Motoko backend (single-actor), and load/update them from the React app using React Query.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-coherent-distinctive-visual-theme-for-the-app-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-all-pages-and-states-empty-loading-error-avoid-blue-purple-as-the-primary-palette",
+      "title": "Add a coherent, distinctive visual theme for the app (colors, typography, spacing, and component styling) and apply it consistently across all pages and states (empty, loading, error). Avoid blue/purple as the primary palette.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-support-for-attaching-a-video-media-source-to-a-streaming-session-so-a-user-can-select-what-video-will-be-streamed",
+      "title": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-streamlabs-like-layer-composition-for-a-session-allowing-users-to-create-and-manage-an-ordered-list-of-visual-layers-scene-overlay-stack-that-will-be-part-of-the-stream-composition",
+      "title": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-a-quick-start-workflow-that-lets-a-user-go-from-zero-to-a-started-stream-with-minimal-steps-create-session-set-video-source-add-at-least-one-output-target-then-start",
+      "title": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Multiplatform streaming: take one video input and stream to multiple platforms, starting with YouTube and extensible to others via a modular framework",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Allow adding/importing video media as a source to be streamed (manage the input media for a stream session)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add Streamlabs-like layering/overlays (scene composition with multiple layers on top of the stream)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Provide a quick-start workflow to start a stream with minimal setup",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Update backend state handling to safely evolve existing sessions to include the new video-source and layer fields without breaking existing persisted data during upgrade.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Multiplatform video restreaming dashboard (YouTube-first, extensible framework)",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

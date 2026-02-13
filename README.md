@@ -1,2 +1,3 @@
-# multiplatform-video-restreaming-dashboard-youtube-first-extensible-framework
-Exported from Caffeine project: Multiplatform video restreaming dashboard (YouTube-first, extensible framework)
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

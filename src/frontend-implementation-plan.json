@@ -1,0 +1,106 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Video sources, layer stack UI, and Quick Start streaming flow",
+  "requirements": [
+    {
+      "id": "REQ-6",
+      "summary": "Allow users to configure a per-session video media source and block starting until configured.",
+      "acceptanceCriteria": [
+        "Frontend provides UI on the session detail page to add/select a video source for the session and to display the currently selected source.",
+        "User-facing validation prevents starting a stream when no video source is configured for the session.",
+        "All user-facing text is in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/sessions/api.ts",
+          "operation": "modify",
+          "description": "Add a frontend API wrapper for the backend capability to store the session video source (call setVideoSource)."
+        },
+        {
+          "path": "frontend/src/features/sessions/mutations.ts",
+          "operation": "modify",
+          "description": "Add a React Query mutation hook for setting a session video source and invalidating the session query on success (with English toast messaging)."
+        },
+        {
+          "path": "frontend/src/components/VideoSourcePanel.tsx",
+          "operation": "create",
+          "description": "Create a video source panel component for the session detail page that lets the user set/update a video URL, shows the currently configured URL/metadata preview state, and uses shadcn-ui form controls (e.g., Card/Input/Button/Alert) for consistent UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/SessionDetailPage.tsx",
+          "operation": "modify",
+          "description": "Wire the VideoSourcePanel into the session detail page, display the currently selected source, and update Start Stream validation: disable Start when outputs are empty or when no video source is configured, and show an English explanation when blocked. Use shadcn-ui Alert for the blocked-state messaging. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Provide a Streamlabs-like ordered layer stack editor on the session detail page (add/remove/reorder/toggle/edit) with persisted updates.",
+      "acceptanceCriteria": [
+        "Frontend provides a layers panel on the session detail page to add, remove, reorder, toggle visibility, and edit basic properties for each layer.",
+        "Layer stack changes persist (reload the session detail page and layers remain).",
+        "The UI clearly indicates layer order (top/bottom) and supports reordering via explicit controls (e.g., move up/down) without requiring real-time collaboration features."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/features/sessions/api.ts",
+          "operation": "modify",
+          "description": "Add frontend API wrappers needed by the layers UI for backend capabilities related to layers (e.g., add layer, fetch layer details, and any additional layer update/reorder/remove capabilities introduced on the backend). Keep calls capability-focused and reusable from the session detail page."
+        },
+        {
+          "path": "frontend/src/features/sessions/queries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks to fetch layer details for a session’s layer id list (batch fetch and per-layer caching) to support the layers panel."
+        },
+        {
+          "path": "frontend/src/features/sessions/mutations.ts",
+          "operation": "modify",
+          "description": "Add React Query mutations needed by the layers panel (add layer and, once available, update/remove/reorder/toggle visibility) and ensure session/layer queries are invalidated so changes persist after reload."
+        },
+        {
+          "path": "frontend/src/components/LayersPanel.tsx",
+          "operation": "create",
+          "description": "Create a layers panel component showing an ordered stack with explicit move up/down controls, add/remove actions, visibility toggle, and basic editable properties (name, source URL, position, size, opacity where applicable). Use shadcn-ui components (Card/Button/Input/Switch/Sheet/Alert as appropriate) and English-only labels/help text. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/SessionDetailPage.tsx",
+          "operation": "modify",
+          "description": "Wire the LayersPanel into the session detail page below the video source section and above/near outputs, passing session layer ids and session id, and ensure UI clearly indicates top/bottom ordering and persists changes by relying on mutations + query invalidation. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Add a Quick Start flow from the sessions list to create/configure a session (title, video source, output) and start streaming with minimal steps.",
+      "acceptanceCriteria": [
+        "From the sessions list page, users can launch a Quick Start flow that guides them through the minimum required inputs (session title, video source, and at least one output target).",
+        "Completing Quick Start creates/updates the session and automatically starts the session (or presents a single final confirmation step) and navigates to the session detail page showing the session as Live.",
+        "Quick Start shows clear inline errors when required information is missing or invalid and never leaves the app in a partially-created state without telling the user what to do next.",
+        "Start is blocked with an English explanation if required prerequisites are not met (no outputs, no video source)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/QuickStartDialog.tsx",
+          "operation": "create",
+          "description": "Create a Quick Start dialog/wizard component launched from the sessions list page that collects session title, video source URL, and one output target (reusing PlatformTargetForm UI patterns). It should run a single final confirmation step that performs: create session → set video source → add output → start session; show inline English errors; and if a failure occurs after session creation, clearly explain next steps and provide a button to navigate to the session detail page to finish setup. Use shadcn-ui Dialog/Stepper-like layout primitives (Dialog, Card, Buttons, Alert) without modifying immutable UI component source. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/SessionsPage.tsx",
+          "operation": "modify",
+          "description": "Add a 'Quick Start' action on the sessions list page, wire it to open QuickStartDialog, and ensure the flow navigates to the newly created session detail page on success."
+        },
+        {
+          "path": "frontend/src/features/sessions/mutations.ts",
+          "operation": "modify",
+          "description": "Add a composed helper (or mutation) used by Quick Start to orchestrate the required sequence (create session, set video source, add output target, start session), with consistent query invalidation and English success/failure toasts."
+        },
+        {
+          "path": "frontend/src/pages/SessionDetailPage.tsx",
+          "operation": "modify",
+          "description": "Align session start blocking/explanations with Quick Start prerequisites by ensuring the Start Stream control is blocked (and explained in English) when video source or outputs are missing, so post-Quick-Start navigation is consistent."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "kind": "build_request",
+  "title": "Add video media sources, Streamlabs-like layers, and quick-start streaming flow",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-6",
+      "text": "Add support for attaching a video media source to a streaming session so a user can select what video will be streamed.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Make sure I can add video as media to be streamed"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend session model can store a non-sensitive video source reference (e.g., URL and basic metadata) associated with a session.",
+        "Frontend provides UI on the session detail page to add/select a video source for the session and to display the currently selected source.",
+        "User-facing validation prevents starting a stream when no video source is configured for the session.",
+        "All user-facing text is in English."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement Streamlabs-like layer composition for a session, allowing users to create and manage an ordered list of visual layers (scene/overlay stack) that will be part of the stream composition.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Make sure I can add layers just like streamlabs"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend stores a per-session layer stack with order and basic properties needed for editing (e.g., type, name, enabled/visible, position/size/opacity where applicable).",
+        "Frontend provides a layers panel on the session detail page to add, remove, reorder, toggle visibility, and edit basic properties for each layer.",
+        "Layer stack changes persist (reload the session detail page and layers remain).",
+        "The UI clearly indicates layer order (top/bottom) and supports reordering via explicit controls (e.g., move up/down) without requiring real-time collaboration features."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Provide a quick-start workflow that lets a user go from zero to a started stream with minimal steps (create session, set video source, add at least one output target, then start).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "And must be have ability to quick start of stream"
+        ]
+      },
+      "acceptanceCriteria": [
+        "From the sessions list page, users can launch a Quick Start flow that guides them through the minimum required inputs (session title, video source, and at least one output target).",
+        "Completing Quick Start creates/updates the session and automatically starts the session (or presents a single final confirmation step) and navigates to the session detail page showing the session as Live.",
+        "Quick Start shows clear inline errors when required information is missing or invalid and never leaves the app in a partially-created state without telling the user what to do next.",
+        "Start is blocked with an English explanation if required prerequisites are not met (no outputs, no video source)."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Update backend state handling to safely evolve existing sessions to include the new video-source and layer fields without breaking existing persisted data during upgrade.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "Make sure I can add video as media to be streamed",
+          "Make sure I can add layers just like streamlabs"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If the backend data types for sessions change, provide a conditional migration that preserves existing sessions and initializes new fields with sensible defaults (e.g., no media source, empty layer list).",
+        "Existing sessions created before this change can still be loaded in the UI and can be updated with a media source and layers."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor with all logic in backend/main.mo (only add backend/migration.mo if required for upgrade compatibility).",
+    "Do not edit frontend files under frontend/src/components/ui or any other paths listed in frontend.immutablePaths.",
+    "No external databases or third-party services for storage; any persisted configuration must be stored in the Motoko canister state.",
+    "Do not implement real-time collaboration, chat, or WebSocket-based syncing."
+  ],
+  "nonGoals": [
+    "Implementing actual live video encoding/transcoding or RTMP broadcasting from within the app/canister.",
+    "Uploading and storing large video files inside the canister (the feature should rely on non-sensitive references/URLs and lightweight metadata).",
+    "A full Streamlabs clone (e.g., plugin marketplace, alerts integrations, donations, chatbot, or advanced animations)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
